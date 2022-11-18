@@ -4,6 +4,8 @@ import 'dart:async';
 import 'package:bluetooth_thermal_printer/bluetooth_thermal_printer.dart';
 import 'package:esc_pos_utils/esc_pos_utils.dart';
 import 'package:flutter/material.dart';
+import 'package:kauveryhospital/screens/flutterposprinter.dart';
+
 import 'package:kauveryhospital/screens/pos_print.dart';
 import 'package:kauveryhospital/screens/token.dart';
 import 'package:location/location.dart';

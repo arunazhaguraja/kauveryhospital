@@ -52,6 +52,13 @@ dependencies:
   flutter_bluetooth_printer: ^2.3.0
 
 
+  oktoast: ^3.0.0
+  image: ^3.0.2
+  esc_pos_bluetooth:
+  charset_converter: ^2.0.0
+
+
+
 
 
 

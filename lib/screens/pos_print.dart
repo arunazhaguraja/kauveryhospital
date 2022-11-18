@@ -49,7 +49,9 @@ class _PrintingWidgetState extends State<PrintingWidget> {
     printer.add(gen.barcode(Barcode.code39(['${widget.currenttoken} ${now.toString()}'])));
     printer.add(gen.text('${widget.currenttoken} ${now.toString()}',),);
     //printer.add(gen.feed(1));
+    print("PPPPPPPPPPPPPPPPPPPPPPP ${printer.toString()}");
     await printer.printData(device);
+
     device.disconnect();
     Navigator.pushReplacement(context, MaterialPageRoute(builder: (c)=>Main()));
   }
