@@ -29,8 +29,8 @@ class _PrintingWidgetState extends State<PrintingWidget> {
     findDevices();
   }
 
-  void findDevices() async{
-    await flutterBlue.startScan(timeout: const Duration(seconds: 4));
+  void findDevices() {
+     flutterBlue.startScan(timeout: const Duration(seconds: 4));
     flutterBlue.scanResults.listen((results) {
       setState(() {
         scanResult = results;
