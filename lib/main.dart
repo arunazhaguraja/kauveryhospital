@@ -1,10 +1,12 @@
 import 'dart:async';
 
+
 import 'package:bluetooth_thermal_printer/bluetooth_thermal_printer.dart';
 import 'package:esc_pos_utils/esc_pos_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:kauveryhospital/screens/pos_print.dart';
 import 'package:kauveryhospital/screens/token.dart';
+import 'package:location/location.dart';
 
 import 'package:kauveryhospital/webview.dart';
 
@@ -20,10 +22,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  @override
-  void initState() {
-    super.initState();
-  }
+
 
   bool connected = false;
   List availableBluetoothDevices = [];
@@ -259,96 +258,98 @@ class Main extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child:
-      Container(
-        width: double.infinity,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
+    return Scaffold(
+      body: SafeArea(
+        child:
+        Container(
+          width: double.infinity,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
 
-            Image.asset("asset/Kauvery_Logo.png"),
-            Container(
-              color: Color(0xffc01c7b),
-             // width: MediaQuery.of(context).size.width,
-              width: double.infinity,
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Center(child: Text("Token Generate",style: TextStyle(backgroundColor: Color(0xffc01c7b),color: Colors.white ),)),
+              Image.asset("asset/Kauvery_Logo.png"),
+              Container(
+                color: Color(0xffc01c7b),
+               // width: MediaQuery.of(context).size.width,
+                width: double.infinity,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Center(child: Text("Token Generate",style: TextStyle(backgroundColor: Color(0xffc01c7b),color: Colors.white ),)),
+                ),
               ),
-            ),
-            TextButton(onPressed: ()async{
-              // var token=await ApiHelper().GetToken();
-              // print("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT${token['Data']}");
-              //Navigator.push(context, MaterialPageRoute(builder: (context) =>  Token(currenttoken:
-             // token['Data']
-              //"1" ,)),);
-              Navigator.push(context, MaterialPageRoute(builder: (context) =>  PrintingWidget(currenttoken: '1',
-              )),);
-            }, child: Container(
-              decoration: BoxDecoration(
-                border: Border.all(color: Color(0xffc01c7b)),
-                color: Color(0xffffcf78),
-                borderRadius: BorderRadius.circular(3),
-              ),
+              TextButton(onPressed: ()async{
+                // var token=await ApiHelper().GetToken();
+                // print("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT${token['Data']}");
+                //Navigator.push(context, MaterialPageRoute(builder: (context) =>  Token(currenttoken:
+               // token['Data']
+                //"1" ,)),);
+                Navigator.push(context, MaterialPageRoute(builder: (context) =>  PrintingWidget(currenttoken: '1',
+                )),);
+              }, child: Container(
+                decoration: BoxDecoration(
+                  border: Border.all(color: Color(0xffc01c7b)),
+                  color: Color(0xffffcf78),
+                  borderRadius: BorderRadius.circular(3),
+                ),
 
-              child: Padding(
-                padding: const EdgeInsets.all(100.0),
-                child: Text("Generate Token",style: TextStyle(color: Color(0xffc01c7b),fontSize: 20,),),
-              ),
-            )),
-            // Container(
-            //   padding: EdgeInsets.all(20),
-            //   child: Column(
-            //     children: [
-            //       Text("Search Paired Bluetooth"),
-            //       TextButton(
-            //         onPressed: () {
-            //           this.getBluetooth();
-            //         },
-            //         child: Text("Search"),
-            //       ),
-            //       Container(
-            //         height: 100,
-            //         child: ListView.builder(
-            //           itemCount: availableBluetoothDevices.length > 0
-            //               ? availableBluetoothDevices.length
-            //               : 0,
-            //           itemBuilder: (context, index) {
-            //             return ListTile(
-            //               onTap: () {
-            //                 String select = availableBluetoothDevices[index];
-            //                 List list = select.split("#");
-            //                 // String name = list[0];
-            //                 String mac = list[1];
-            //                 this.setConnect(mac);
-            //               },
-            //               title: Text('${availableBluetoothDevices[index]}'),
-            //               subtitle: Text("Click to connect"),
-            //             );
-            //           },
-            //         ),
-            //       ),
-            //       SizedBox(
-            //         height: 30,
-            //       ),
-            //       TextButton(
-            //         onPressed: connected ? this.printGraphics : null,
-            //         child: Text("Print"),
-            //       ),
-            //       TextButton(
-            //         onPressed: connected ? this.printTicket : null,
-            //         child: Text("Print Ticket"),
-            //       ),
-            //     ],
-            //   ),
-            // ),
-          ],
+                child: Padding(
+                  padding: const EdgeInsets.all(100.0),
+                  child: Text("Generate Token",style: TextStyle(color: Color(0xffc01c7b),fontSize: 20,),),
+                ),
+              )),
+              // Container(
+              //   padding: EdgeInsets.all(20),
+              //   child: Column(
+              //     children: [
+              //       Text("Search Paired Bluetooth"),
+              //       TextButton(
+              //         onPressed: () {
+              //           this.getBluetooth();
+              //         },
+              //         child: Text("Search"),
+              //       ),
+              //       Container(
+              //         height: 100,
+              //         child: ListView.builder(
+              //           itemCount: availableBluetoothDevices.length > 0
+              //               ? availableBluetoothDevices.length
+              //               : 0,
+              //           itemBuilder: (context, index) {
+              //             return ListTile(
+              //               onTap: () {
+              //                 String select = availableBluetoothDevices[index];
+              //                 List list = select.split("#");
+              //                 // String name = list[0];
+              //                 String mac = list[1];
+              //                 this.setConnect(mac);
+              //               },
+              //               title: Text('${availableBluetoothDevices[index]}'),
+              //               subtitle: Text("Click to connect"),
+              //             );
+              //           },
+              //         ),
+              //       ),
+              //       SizedBox(
+              //         height: 30,
+              //       ),
+              //       TextButton(
+              //         onPressed: connected ? this.printGraphics : null,
+              //         child: Text("Print"),
+              //       ),
+              //       TextButton(
+              //         onPressed: connected ? this.printTicket : null,
+              //         child: Text("Print Ticket"),
+              //       ),
+              //     ],
+              //   ),
+              // ),
+            ],
 
+          ),
         ),
-      ),
 
+      ),
     );
   }
 }

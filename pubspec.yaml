@@ -32,7 +32,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  esc_pos_utils: ^1.0.0
+
   bluetooth_thermal_printer: ^0.0.6
   webview_flutter: ^3.0.4
   url_launcher: ^6.1.6
@@ -43,7 +43,13 @@ dependencies:
   path_provider: ^2.0.11
   widgets_to_image: ^0.0.2
   http: ^0.13.5
+
   flutter_blue: ^0.8.0
+  esc_pos_utils: ^1.1.0
+  blue_thermal_printer: ^1.2.3
+  location: ^4.3.0
+  geolocator: ^5.3.0
+  flutter_bluetooth_serial: ^0.3.2
 
 
 

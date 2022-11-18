@@ -11,6 +11,7 @@ import '../utlity/blue_print.dart';
 
 FlutterBlue flutterBlue = FlutterBlue.instance;
 
+
 class PrintingWidget extends StatefulWidget {
   final currenttoken;
   const PrintingWidget({Key? key,this.currenttoken}) : super(key: key);
@@ -28,8 +29,8 @@ class _PrintingWidgetState extends State<PrintingWidget> {
     findDevices();
   }
 
-  void findDevices() {
-    flutterBlue.startScan(timeout: const Duration(seconds: 4));
+  void findDevices() async{
+    await flutterBlue.startScan(timeout: const Duration(seconds: 4));
     flutterBlue.scanResults.listen((results) {
       setState(() {
         scanResult = results;
