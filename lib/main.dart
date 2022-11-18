@@ -3,9 +3,12 @@ import 'dart:async';
 import 'package:bluetooth_thermal_printer/bluetooth_thermal_printer.dart';
 import 'package:esc_pos_utils/esc_pos_utils.dart';
 import 'package:flutter/material.dart';
+import 'package:kauveryhospital/screens/pos_print.dart';
 import 'package:kauveryhospital/screens/token.dart';
 
 import 'package:kauveryhospital/webview.dart';
+
+import 'api/tokenAPI.dart';
 
 void main() {
   runApp(MyApp());
@@ -240,64 +243,11 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
+      debugShowCheckedModeBanner: false,
        home: Scaffold(
          body: Main(),
        ),
-       //WebViewPrint(url: "http://88.99.28.142:1728/Token/CreateToken",)
-      // Scaffold(
-      //   appBar: AppBar(
-      //     title: const Text('Bluetooth Thermal Printer Demo'),
-      //   ),
-      //   body:
-      //   Container(
-      //     padding: EdgeInsets.all(20),
-      //     child: Column(
-      //       crossAxisAlignment: CrossAxisAlignment.start,
-      //       children: [
-      //         Text("Search Paired Bluetooth"),
-      //         TextButton(
-      //           onPressed: () {
-      //             this.getBluetooth();
-      //           },
-      //           child: Text("Search"),
-      //         ),
-      //         Container(
-      //           height: 200,
-      //           child: ListView.builder(
-      //             itemCount: availableBluetoothDevices.length > 0
-      //                 ? availableBluetoothDevices.length
-      //                 : 0,
-      //             itemBuilder: (context, index) {
-      //               return ListTile(
-      //                 onTap: () {
-      //                   String select = availableBluetoothDevices[index];
-      //                   List list = select.split("#");
-      //                   // String name = list[0];
-      //                   String mac = list[1];
-      //                   this.setConnect(mac);
-      //                 },
-      //                 title: Text('${availableBluetoothDevices[index]}'),
-      //                 subtitle: Text("Click to connect"),
-      //               );
-      //             },
-      //           ),
-      //         ),
-      //         SizedBox(
-      //           height: 30,
-      //         ),
-      //         TextButton(
-      //           onPressed: connected ? this.printGraphics : null,
-      //           child: Text("Print"),
-      //         ),
-      //         TextButton(
-      //           onPressed: connected ? this.printTicket : null,
-      //           child: Text("Print Ticket"),
-      //         ),
-      //       ],
-      //     ),
-      //   ),
-      // ),
     );
   }
 }
@@ -328,7 +278,14 @@ class Main extends StatelessWidget {
                 child: Center(child: Text("Token Generate",style: TextStyle(backgroundColor: Color(0xffc01c7b),color: Colors.white ),)),
               ),
             ),
-            TextButton(onPressed: (){Navigator.push(context, MaterialPageRoute(builder: (context) =>  Token()),);
+            TextButton(onPressed: ()async{
+              // var token=await ApiHelper().GetToken();
+              // print("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT${token['Data']}");
+              //Navigator.push(context, MaterialPageRoute(builder: (context) =>  Token(currenttoken:
+             // token['Data']
+              //"1" ,)),);
+              Navigator.push(context, MaterialPageRoute(builder: (context) =>  PrintingWidget(currenttoken: '1',
+              )),);
             }, child: Container(
               decoration: BoxDecoration(
                 border: Border.all(color: Color(0xffc01c7b)),
@@ -337,8 +294,8 @@ class Main extends StatelessWidget {
               ),
 
               child: Padding(
-                padding: const EdgeInsets.all(50.0),
-                child: Text("Generate Token",style: TextStyle(color: Color(0xffc01c7b),),),
+                padding: const EdgeInsets.all(100.0),
+                child: Text("Generate Token",style: TextStyle(color: Color(0xffc01c7b),fontSize: 20,),),
               ),
             )),
             // Container(
