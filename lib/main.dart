@@ -8,7 +8,6 @@ import 'package:kauveryhospital/screens/flutterposprinter.dart';
 
 import 'package:kauveryhospital/screens/pos_print.dart';
 import 'package:kauveryhospital/screens/token.dart';
-import 'package:location/location.dart';
 
 import 'package:kauveryhospital/webview.dart';
 

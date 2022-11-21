@@ -43,12 +43,16 @@ class _PrintingWidgetState extends State<PrintingWidget> {
     await device.connect();
     final gen = Generator(PaperSize.mm58, await CapabilityProfile.load());
     final printer = BluePrint();
+    print("PPPPPPPPPPPPPPPPPPPPPPP ${printer.toString()}");
 
-    printer.add(gen.text(widget.currenttoken.toString(),styles: PosStyles(height: PosTextSize.size5)));
+    printer.add(gen.text(widget.currenttoken.toString(),styles: PosStyles(height: PosTextSize.size1)));
     //printer.add(gen.qrcode('${widget.currenttoken} ${now.toString()}',),);
-    printer.add(gen.barcode(Barcode.code39(['${widget.currenttoken} ${now.toString()}'])));
+    var currenttokendatenow = '${widget.currenttoken} ${now.toString()}'.split(',');
+    printer.add(gen.barcode(Barcode.code39([currenttokendatenow])));
+    //printer.add(gen.barcode(Barcode.code39(widget.currenttoken.tolist())));
+
     printer.add(gen.text('${widget.currenttoken} ${now.toString()}',),);
-    //printer.add(gen.feed(1));
+    printer.add(gen.feed(1));
     print("PPPPPPPPPPPPPPPPPPPPPPP ${printer.toString()}");
     await printer.printData(device);
 
@@ -109,7 +113,9 @@ class _PrintingWidgetState extends State<PrintingWidget> {
                         return ListTile(
                           title: Text(scanResult![index].device.name),
                           subtitle: Text(scanResult![index].device.id.id),
-                          onTap: () => printWithDevice(scanResult![index].device),
+                          onTap: () => {
+                            scanResult![index].device.disconnect(),
+                            printWithDevice(scanResult![index].device)},
                         );
                       },
                       separatorBuilder: (context, index) => const Divider(),
