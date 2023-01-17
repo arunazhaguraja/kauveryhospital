@@ -7,10 +7,13 @@ import 'package:http/http.dart' as http;
 
 class ApiHelper {
 
-  var toekngeturl="http://88.99.28.142:1728/api/WebAPI/GetToken";
+  var toekngeturl="http://signalr.timesmed.com/api/webapi/GetTokens";
 
   Future GetToken()async{
     var response= await http.get(Uri.parse(toekngeturl));
-    return jsonDecode(response.body);
+    Map<String, dynamic> responseJson = json.decode(response.body);
+    print(responseJson['Data']);
+   // print(jsonDecode(response.body));
+    return responseJson['Data'];
   }
 }

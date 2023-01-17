@@ -1,19 +1,54 @@
 import 'dart:async';
+import 'dart:io';
 
 
 import 'package:bluetooth_thermal_printer/bluetooth_thermal_printer.dart';
 import 'package:esc_pos_utils/esc_pos_utils.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:kauveryhospital/screens/flutterposprinter.dart';
 
 import 'package:kauveryhospital/screens/pos_print.dart';
 import 'package:kauveryhospital/screens/token.dart';
 
 import 'package:kauveryhospital/webview.dart';
+import 'package:signalr_flutter/signalr_api.dart';
+import 'package:signalr_flutter/signalr_flutter.dart';
+import 'package:signalr_netcore/http_connection_options.dart';
+import 'package:signalr_netcore/hub_connection_builder.dart';
+import 'package:signalr_netcore/itransport.dart';
+
 
 import 'api/tokenAPI.dart';
 
-void main() {
+
+Future main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  // await Permission.camera.request();
+  // await Permission.microphone.request();
+  // await Permission.storage.request();
+
+  if (Platform.isAndroid) {
+    await AndroidInAppWebViewController.setWebContentsDebuggingEnabled(true);
+
+    var swAvailable = await AndroidWebViewFeature.isFeatureSupported(
+        AndroidWebViewFeature.SERVICE_WORKER_BASIC_USAGE);
+    var swInterceptAvailable = await AndroidWebViewFeature.isFeatureSupported(
+        AndroidWebViewFeature.SERVICE_WORKER_SHOULD_INTERCEPT_REQUEST);
+
+    if (swAvailable && swInterceptAvailable) {
+      AndroidServiceWorkerController serviceWorkerController =
+      AndroidServiceWorkerController.instance();
+
+      await serviceWorkerController
+          .setServiceWorkerClient(AndroidServiceWorkerClient(
+        shouldInterceptRequest: (request) async {
+          print(request);
+          return null;
+        },
+      ));
+    }
+  }
   runApp(MyApp());
 }
 
@@ -243,7 +278,7 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return  MaterialApp(
       debugShowCheckedModeBanner: false,
        home: Scaffold(
          body: Main(),
@@ -253,9 +288,73 @@ class _MyAppState extends State<MyApp> {
 }
 
 class Main extends StatelessWidget {
-  const Main({
+   Main({
     Key? key,
   }) : super(key: key);
+
+  // SignalrSocket signalrSocket = SignalrSocket(
+  //   url: 'http://signalr.timesmed.com/',
+  //   hubName: 'chatHub',
+  //   eventName: 'addNewMessageToPage',
+  //   queryString: {'key': 'value'},
+  //   updateConnectionStatus: (status) {
+  //     debugPrint("signalr socket update connection status ${status.name}");
+  //   },
+  //   newMessage: (message) {
+  //     debugPrint("signalr socket new message $message");
+  //   },
+  // );
+   // Import the library.
+
+   // SignalR signalR = SignalR(
+   //
+   //     'http://signalr.timesmed.com/signalr/hubs',
+   //
+   //     "hubs",
+   //     hubMethods: ["addNewMessageToPage"],
+   //     statusChangeCallback: (status) => print("STAUTSSSSSSSSSS$status"),
+   // //transport: Transport.longPolling,
+   //
+   // hubCallback: (methodName, message) => print('MethodName = $methodName, Message = $message'));
+
+   SignalR()async{
+     // The location of the SignalR Server.
+     final serverUrl = "http://signalr.timesmed.com/signalr/hubs";
+// Creates the connection by using the HubConnectionBuilder.
+
+     final hubConnection = HubConnectionBuilder().withUrl(serverUrl,
+         options: HttpConnectionOptions(
+                     skipNegotiation: true,
+                     transport: HttpTransportType.WebSockets,
+                 ),
+         //transportType: HttpTransportType.WebSockets
+
+     ).build();
+// When the connection is closed, print out a message to the console.
+     await hubConnection.start();
+     //hubConnection.onclose( ({error}) => {print("OnCLOSE ERROR $error")},);
+
+   }
+
+  // SignalR()async{
+  //   final connection =new  HubConnectionBuilder().withUrl('wss://signalr.timesmed.com/signalr/hubs',
+  //       options: HttpConnectionOptions(
+  //           skipNegotiation: true,
+  //           transport: HttpTransportType.WebSockets,
+  //
+  //       ),
+  //       //transportType: HttpTransportType.ServerSentEvents,
+  //   ).build();
+  //
+  //   await connection.start();
+  //
+  //   // connection.on('ReceiveMessage', (message) {
+  //   //   print(message.toString());
+  //   // });
+  //
+  //  // await connection.invoke('SendMessage', args: ['Bob', 'Says hi!']);
+  // }
+
 
   @override
   Widget build(BuildContext context) {
@@ -280,13 +379,14 @@ class Main extends StatelessWidget {
                 ),
               ),
               TextButton(onPressed: ()async{
-                // var token=await ApiHelper().GetToken();
-                // print("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT${token['Data']}");
-                //Navigator.push(context, MaterialPageRoute(builder: (context) =>  Token(currenttoken:
-               // token['Data']
-                //"1" ,)),);
-                Navigator.push(context, MaterialPageRoute(builder: (context) =>  PrintingWidget(currenttoken: '1',
-                )),);
+               var token=await ApiHelper().GetToken();
+               // print("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT${token}");
+               //await SignalR();
+                //await signalR.connect();
+
+                Navigator.push(context, MaterialPageRoute(builder: (context) =>  PrintingWidget(currenttoken:token)),);
+                // Navigator.push(context, MaterialPageRoute(builder: (context) =>  PrintingWidget(currenttoken: '1',
+                // )),);
               }, child: Container(
                 decoration: BoxDecoration(
                   border: Border.all(color: Color(0xffc01c7b)),
