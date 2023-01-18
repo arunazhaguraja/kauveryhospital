@@ -17,6 +17,7 @@ import 'package:signalr_flutter/signalr_flutter.dart';
 import 'package:signalr_netcore/http_connection_options.dart';
 import 'package:signalr_netcore/hub_connection_builder.dart';
 import 'package:signalr_netcore/itransport.dart';
+import 'package:web_view_tts/web_view_tts.dart';
 
 
 import 'api/tokenAPI.dart';
@@ -276,12 +277,37 @@ class _MyAppState extends State<MyApp> {
     return bytes;
   }
 
+
+  InAppWebViewController? webViewController;
+
+  onLoadStart(controller) async {
+    await WebViewTTS.init(controller: controller);
+
+  }
   @override
   Widget build(BuildContext context) {
     return  MaterialApp(
       debugShowCheckedModeBanner: false,
        home: Scaffold(
-         body: Main(),
+         body: Stack(
+           children: [
+             InAppWebView(
+                 initialUrlRequest: URLRequest(url: Uri.parse("http://signalr.timesmed.com/Login/KaveriLogin")),
+
+                 onLoadStart: (cntrl, url) => onLoadStart(cntrl),
+                 initialOptions: InAppWebViewGroupOptions(
+                     android: AndroidInAppWebViewOptions(
+                       useHybridComposition: true,
+                       allowContentAccess: true,
+                     )),
+                 androidOnPermissionRequest: (InAppWebViewController controller, String origin, List<String> resources) async {
+                   return PermissionRequestResponse(resources: resources, action: PermissionRequestResponseAction.GRANT);
+                 }
+
+             ),
+             Main(),
+           ],
+         ),
        ),
     );
   }
@@ -355,99 +381,123 @@ class Main extends StatelessWidget {
   //  // await connection.invoke('SendMessage', args: ['Bob', 'Says hi!']);
   // }
 
+   InAppWebViewController? webViewController;
 
+   onLoadStart(controller) async {
+     await WebViewTTS.init(controller: controller);
+
+   }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
         child:
-        Container(
-          width: double.infinity,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
+        Stack(
+          children: [
+            // InAppWebView(
+            //     initialUrlRequest: URLRequest(url: Uri.parse("http://signalr.timesmed.com/Login/KaveriLogin")),
+            //
+            //     onLoadStart: (cntrl, url) => onLoadStart(cntrl),
+            //     initialOptions: InAppWebViewGroupOptions(
+            //         android: AndroidInAppWebViewOptions(
+            //           useHybridComposition: true,
+            //           allowContentAccess: true,
+            //         )),
+            //     androidOnPermissionRequest: (InAppWebViewController controller, String origin, List<String> resources) async {
+            //       return PermissionRequestResponse(resources: resources, action: PermissionRequestResponseAction.GRANT);
+            //     }
+            //
+            // ),
+            Container(
+              color: Colors.white,
+              width: double.infinity,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
 
-              Image.asset("asset/Kauvery_Logo.png"),
-              Container(
-                color: Color(0xffc01c7b),
-               // width: MediaQuery.of(context).size.width,
-                width: double.infinity,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Center(child: Text("Token Generate",style: TextStyle(backgroundColor: Color(0xffc01c7b),color: Colors.white ),)),
-                ),
+                  Image.asset("asset/Kauvery_Logo.png"),
+                  Container(
+                    color: Color(0xffc01c7b),
+                   // width: MediaQuery.of(context).size.width,
+                    width: double.infinity,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Center(child: Text("Token Generate",style: TextStyle(backgroundColor: Color(0xffc01c7b),color: Colors.white ),)),
+                    ),
+                  ),
+                  TextButton(onPressed: ()async{
+                   var token=await ApiHelper().GetToken();
+                   // print("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT${token}");
+                   //await SignalR();
+                    //await signalR.connect();
+
+                    Navigator.push(context, MaterialPageRoute(builder: (context) =>  PrintingWidget(currenttoken:token)),);
+                    // Navigator.push(context, MaterialPageRoute(builder: (context) =>  PrintingWidget(currenttoken: '1',
+                    // )),);
+                  }, child: Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Color(0xffc01c7b)),
+                      color: Color(0xffffcf78),
+                      borderRadius: BorderRadius.circular(3),
+                    ),
+
+                    child: Padding(
+                      padding: const EdgeInsets.all(100.0),
+                      child: Text("Generate Token",style: TextStyle(color: Color(0xffc01c7b),fontSize: 20,),),
+                    ),
+                  )),
+                  // Container(
+                  //   padding: EdgeInsets.all(20),
+                  //   child: Column(
+                  //     children: [
+                  //       Text("Search Paired Bluetooth"),
+                  //       TextButton(
+                  //         onPressed: () {
+                  //           this.getBluetooth();
+                  //         },
+                  //         child: Text("Search"),
+                  //       ),
+                  //       Container(
+                  //         height: 100,
+                  //         child: ListView.builder(
+                  //           itemCount: availableBluetoothDevices.length > 0
+                  //               ? availableBluetoothDevices.length
+                  //               : 0,
+                  //           itemBuilder: (context, index) {
+                  //             return ListTile(
+                  //               onTap: () {
+                  //                 String select = availableBluetoothDevices[index];
+                  //                 List list = select.split("#");
+                  //                 // String name = list[0];
+                  //                 String mac = list[1];
+                  //                 this.setConnect(mac);
+                  //               },
+                  //               title: Text('${availableBluetoothDevices[index]}'),
+                  //               subtitle: Text("Click to connect"),
+                  //             );
+                  //           },
+                  //         ),
+                  //       ),
+                  //       SizedBox(
+                  //         height: 30,
+                  //       ),
+                  //       TextButton(
+                  //         onPressed: connected ? this.printGraphics : null,
+                  //         child: Text("Print"),
+                  //       ),
+                  //       TextButton(
+                  //         onPressed: connected ? this.printTicket : null,
+                  //         child: Text("Print Ticket"),
+                  //       ),
+                  //     ],
+                  //   ),
+                  // ),
+                ],
+
               ),
-              TextButton(onPressed: ()async{
-               var token=await ApiHelper().GetToken();
-               // print("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT${token}");
-               //await SignalR();
-                //await signalR.connect();
-
-                Navigator.push(context, MaterialPageRoute(builder: (context) =>  PrintingWidget(currenttoken:token)),);
-                // Navigator.push(context, MaterialPageRoute(builder: (context) =>  PrintingWidget(currenttoken: '1',
-                // )),);
-              }, child: Container(
-                decoration: BoxDecoration(
-                  border: Border.all(color: Color(0xffc01c7b)),
-                  color: Color(0xffffcf78),
-                  borderRadius: BorderRadius.circular(3),
-                ),
-
-                child: Padding(
-                  padding: const EdgeInsets.all(100.0),
-                  child: Text("Generate Token",style: TextStyle(color: Color(0xffc01c7b),fontSize: 20,),),
-                ),
-              )),
-              // Container(
-              //   padding: EdgeInsets.all(20),
-              //   child: Column(
-              //     children: [
-              //       Text("Search Paired Bluetooth"),
-              //       TextButton(
-              //         onPressed: () {
-              //           this.getBluetooth();
-              //         },
-              //         child: Text("Search"),
-              //       ),
-              //       Container(
-              //         height: 100,
-              //         child: ListView.builder(
-              //           itemCount: availableBluetoothDevices.length > 0
-              //               ? availableBluetoothDevices.length
-              //               : 0,
-              //           itemBuilder: (context, index) {
-              //             return ListTile(
-              //               onTap: () {
-              //                 String select = availableBluetoothDevices[index];
-              //                 List list = select.split("#");
-              //                 // String name = list[0];
-              //                 String mac = list[1];
-              //                 this.setConnect(mac);
-              //               },
-              //               title: Text('${availableBluetoothDevices[index]}'),
-              //               subtitle: Text("Click to connect"),
-              //             );
-              //           },
-              //         ),
-              //       ),
-              //       SizedBox(
-              //         height: 30,
-              //       ),
-              //       TextButton(
-              //         onPressed: connected ? this.printGraphics : null,
-              //         child: Text("Print"),
-              //       ),
-              //       TextButton(
-              //         onPressed: connected ? this.printTicket : null,
-              //         child: Text("Print Ticket"),
-              //       ),
-              //     ],
-              //   ),
-              // ),
-            ],
-
-          ),
+            ),
+          ],
         ),
 
       ),

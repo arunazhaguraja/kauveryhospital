@@ -119,20 +119,20 @@ class _PrintingWidgetState extends State<PrintingWidget> {
       body: SafeArea(
         child: Stack(
           children: [
-            InAppWebView(
-                initialUrlRequest: URLRequest(url: Uri.parse("http://signalr.timesmed.com/Login/KaveriLogin")),
-
-                onLoadStart: (cntrl, url) => onLoadStart(cntrl),
-                initialOptions: InAppWebViewGroupOptions(
-                    android: AndroidInAppWebViewOptions(
-                      useHybridComposition: true,
-                      allowContentAccess: true,
-                    )),
-                androidOnPermissionRequest: (InAppWebViewController controller, String origin, List<String> resources) async {
-                  return PermissionRequestResponse(resources: resources, action: PermissionRequestResponseAction.GRANT);
-                }
-
-            ),
+            // InAppWebView(
+            //     initialUrlRequest: URLRequest(url: Uri.parse("http://signalr.timesmed.com/Login/KaveriLogin")),
+            //
+            //     onLoadStart: (cntrl, url) => onLoadStart(cntrl),
+            //     initialOptions: InAppWebViewGroupOptions(
+            //         android: AndroidInAppWebViewOptions(
+            //           useHybridComposition: true,
+            //           allowContentAccess: true,
+            //         )),
+            //     androidOnPermissionRequest: (InAppWebViewController controller, String origin, List<String> resources) async {
+            //       return PermissionRequestResponse(resources: resources, action: PermissionRequestResponseAction.GRANT);
+            //     }
+            //
+            // ),
             // FutureBuilder(builder: (context,snap){
             //   return _launchURL(context);
             // }),
