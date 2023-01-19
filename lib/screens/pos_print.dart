@@ -1,9 +1,10 @@
+import 'dart:async';
+import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:dotted_border/dotted_border.dart';
 import 'package:esc_pos_utils/esc_pos_utils.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_blue/flutter_blue.dart';
 import 'package:flutter_custom_tabs/flutter_custom_tabs.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:intl/intl.dart';
@@ -14,13 +15,14 @@ import 'package:webview_flutter/platform_interface.dart';
 import 'package:webview_flutter/webview_flutter.dart' as WV;
 import 'package:widgets_to_image/widgets_to_image.dart';
 
+import 'package:flutter_blue_plus/flutter_blue_plus.dart';
+
 import 'dart:io';
 
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 
 import '../main.dart';
-import '../utlity/blue_print.dart';
 
 class MyChromeSafariBrowser extends ChromeSafariBrowser {
   @override
@@ -28,20 +30,20 @@ class MyChromeSafariBrowser extends ChromeSafariBrowser {
     print("ChromeSafari browser opened");
   }
 
-
   @override
   void onClosed() {
     print("ChromeSafari browser closed");
   }
 }
 
-FlutterBlue flutterBlue = FlutterBlue.instance;
+FlutterBluePlus flutterBlue = FlutterBluePlus.instance;
+final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
 class PrintingWidget extends StatefulWidget {
   final ChromeSafariBrowser browser = MyChromeSafariBrowser();
   final currenttoken;
 
-   PrintingWidget({Key? key, this.currenttoken}) : super(key: key);
+  PrintingWidget({Key? key, this.currenttoken}) : super(key: key);
 
   @override
   _PrintingWidgetState createState() => _PrintingWidgetState();
@@ -57,14 +59,24 @@ class _PrintingWidgetState extends State<PrintingWidget> {
   void initState() {
     super.initState();
     findDevices();
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => AutoSelectandprintToken());
   }
 
-  void findDevices() {
+  @override
+  void dispose() {
+    scanResult?.clear();
+    super.dispose();
+  }
+
+  void findDevices() async {
     flutterBlue.startScan(timeout: const Duration(seconds: 4));
     flutterBlue.scanResults.listen((results) {
-      setState(() {
-        scanResult = results;
-      });
+      if (mounted) {
+        setState(() {
+          scanResult = results;
+        });
+      }
     });
     flutterBlue.stopScan();
   }
@@ -85,14 +97,22 @@ class _PrintingWidgetState extends State<PrintingWidget> {
     final printer = BluePrint();
     print("PPPPPPPPPPPPPPPPPPPPPPP ${printer.toString()}");
     //printer.add(gen.hr());
-    printer.add(gen.image(getSetImage()));
+    //printer.add(gen.image(getSetImage()));
 
-    // printer.add(gen.text(widget.currenttoken.toString(),styles: PosStyles(height: PosTextSize.size1)));
-    // printer.add(gen.qrcode('${widget.currenttoken} ${now.toString()}',),);
-    // var currenttokendatenow = '${widget.currenttoken} ${now.toString()}'.split(',');
-    // printer.add(gen.barcode(Barcode.code39([currenttokendatenow])));
-    // printer.add(gen.barcode(Barcode.code39(widget.currenttoken.tolist())));
-    //printer.add(gen.text('${widget.currenttoken} ${now.toString()}',),);
+    printer.add(gen.text(widget.currenttoken.toString(),
+        styles: PosStyles(height: PosTextSize.size8)));
+    printer.add(
+      gen.qrcode('${widget.currenttoken} ${now.toString()}',
+          size: QRSize.Size8),
+    );
+    //var currenttokendatenow = '${widget.currenttoken} ${now.toString()}'.split(',');
+    //printer.add(gen.barcode(Barcode.code39([currenttokendatenow])));
+    printer.add(gen.barcode(Barcode.code39(widget.currenttoken.tolist())));
+    printer.add(
+      gen.text(
+        '${widget.currenttoken} ${now.toString()}',
+      ),
+    );
     //printer.add(gen.feed(1));
     printer.add(gen.cut());
     print("PPPPPPPPPPPPPPPPPPPPPPP ${printer.toString()}");
@@ -111,11 +131,14 @@ class _PrintingWidgetState extends State<PrintingWidget> {
 
   onLoadStart(controller) async {
     await WebViewTTS.init(controller: controller);
-
   }
 
+  bool onTapped = false;
+
   Widget build(BuildContext context) {
+    //AutoSelectandprintToken();
     return Scaffold(
+      key: _scaffoldKey,
       body: SafeArea(
         child: Stack(
           children: [
@@ -202,64 +225,96 @@ class _PrintingWidgetState extends State<PrintingWidget> {
                           ),
                         ),
                       ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Text(
-                        "Select Printer Device to print",
-                        style: TextStyle(color: Color(0xffc01c7b)),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: Color(0xffc01c7b)),
-                          ),
-                          height: 300,
-                          child: ListView.separated(
-                            itemBuilder: (context, index) {
-                              return ListTile(
-                                title: Text(scanResult![index].device.name),
-                                subtitle: Text(scanResult![index].device.id.id),
-                                onTap: () => {
-                                  scanResult![index].device.disconnect(),
-                                  printWithDevice(scanResult![index].device)
-                                },
-                              );
-                            },
-                            separatorBuilder: (context, index) =>
-                                const Divider(),
-                            itemCount: scanResult?.length ?? 0,
-                          ),
-                        ),
-                      ),
+                      //  SizedBox(
+                      //    height: 10,
+                      //  ),
+                      //  Text(
+                      //    "Select Printer Device to print",
+                      //    style: TextStyle(color: Color(0xffc01c7b)),
+                      //  ),
+                      // onTapped?SizedBox(
+                      //     height:100,child: Center(child: CircularProgressIndicator())): Padding(
+                      //    padding: const EdgeInsets.all(8.0),
+                      //    child: Container(
+                      //      decoration: BoxDecoration(
+                      //        borderRadius: BorderRadius.circular(10),
+                      //        border: Border.all(color: Color(0xffc01c7b)),
+                      //      ),
+                      //      height: 300,
+                      //      child: ListView.separated(
+                      //        itemBuilder: (context, index) {
+                      //          return ListTile(
+                      //            title: Text(scanResult![index].device.name),
+                      //            subtitle: Text(scanResult![index].device.id.id),
+                      //            onTap: () => {
+                      //              setState(()  {
+                      //           onTapped=true;
+                      //              }),
+                      //              scanResult![index].device.disconnect(),
+                      //              printWithDevice(scanResult![index].device)
+                      //            },
+                      //          );
+                      //        },
+                      //        separatorBuilder: (context, index) =>
+                      //            const Divider(),
+                      //        itemCount: scanResult?.length ?? 0,
+                      //      ),
+                      //    ),
+                      //  ),
                     ],
                   ),
                 ),
               ),
             ),
 
-
-
-          // Center(
-          //   child: ElevatedButton(
-          //       onPressed: () async {
-          //         await
-          //           widget.browser.open(
-          //             url: Uri.parse("http://signalr.timesmed.com/Login/KaveriLogin"),
-          //             );
-          //       },
-          //       child: Text("Open Chrome Safari Browser")),
-          // )
-
+            // Center(
+            //   child: ElevatedButton(
+            //       onPressed: () async {
+            //         await
+            //           widget.browser.open(
+            //             url: Uri.parse("http://signalr.timesmed.com/Login/KaveriLogin"),
+            //             );
+            //       },
+            //       child: Text("Open Chrome Safari Browser")),
+            // )
           ],
         ),
       ),
     );
   }
 
-   _launchURL(BuildContext context) async {
+  AutoSelectandprintToken() {
+    List dummylsit = [1, 2];
+    bool found = false;
+    int k = 0;
+    found?null:Timer.periodic(Duration(seconds: 2), (timer) {
+
+      if (scanResult == null) {
+        print("NOPPPPEE");
+      } else {
+        for (int i = 0; i < (scanResult!.length); i++) {
+          print(
+              "SSSSSSSSSSSSSSSSSSSSSSSSS${scanResult![i].device.id.id.toString()}");
+          if ('${scanResult![i].device.id.id}' == '03:12:44:DAA:57:3C') {
+            found = true;
+            printWithDevice(scanResult![i].device);
+            timer.cancel();
+            break;
+          }
+        }
+        k++;
+
+        found
+            ? {
+                ScaffoldMessenger.of(context)
+                    .showSnackBar(SnackBar(content: Text('Printing')))
+              }
+            : null;
+      }
+    });
+  }
+
+  _launchURL(BuildContext context) async {
     try {
       await launch(
         'http://signalr.timesmed.com/Login/KaveriLogin',
@@ -280,5 +335,58 @@ class _PrintingWidgetState extends State<PrintingWidget> {
       debugPrint(e.toString());
     }
   }
+}
 
+class BluePrint {
+  BluePrint({this.chunkLen = 512});
+
+  final int chunkLen;
+  final _data = List<int>.empty(growable: true);
+
+  void add(List<int> data) {
+    _data.addAll(data);
+  }
+
+  List<List<int>> getChunks() {
+    final chunks = List<List<int>>.empty(growable: true);
+    for (var i = 0; i < _data.length; i += chunkLen) {
+      chunks.add(_data.sublist(i, min(i + chunkLen, _data.length)));
+    }
+    return chunks;
+  }
+
+  Future<void> printData(BluetoothDevice device) async {
+    final data = getChunks();
+    final characs = await _getCharacteristics(device);
+    for (var i = 0; i < characs.length; i++) {
+      if (await _tryPrint(characs[i], data)) {
+        break;
+      }
+    }
+  }
+
+  Future<bool> _tryPrint(
+    BluetoothCharacteristic charac,
+    List<List<int>> data,
+  ) async {
+    for (var i = 0; i < data.length; i++) {
+      try {
+        await charac.write(data[i]);
+      } catch (e) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  Future<List<BluetoothCharacteristic>> _getCharacteristics(
+    BluetoothDevice device,
+  ) async {
+    final services = await device.discoverServices();
+    final res = List<BluetoothCharacteristic>.empty(growable: true);
+    for (var i = 0; i < services.length; i++) {
+      res.addAll(services[i].characteristics);
+    }
+    return res;
+  }
 }

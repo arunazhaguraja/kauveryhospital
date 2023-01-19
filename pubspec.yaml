@@ -46,7 +46,9 @@ dependencies:
   widgets_to_image: ^0.0.2
   http: ^0.13.5
 
-  flutter_blue: ^0.8.0
+
+  flutter_blue_plus: ^1.4.0
+
   esc_pos_utils: ^1.1.0
   blue_thermal_printer: ^1.2.3
   location: ^4.3.0
@@ -60,7 +62,7 @@ dependencies:
 
   oktoast: ^3.0.0
   image: ^3.0.2
-  esc_pos_bluetooth:
+
   charset_converter: ^2.0.0
 
 

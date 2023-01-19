@@ -2,3 +2,4 @@
 -keep class com.github.signalr4j.client.hubs.HubInvocation { *; }
 -keep class com.github.signalr4j.client.hubs.HubProxy$* { *; }
 -keep class com.github.signalr4j.client.hubs.HubConnection {*;}
+-keep class com.boskokg.flutter_blue_plus.** { *; }

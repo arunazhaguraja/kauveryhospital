@@ -5,8 +5,8 @@ import 'dart:io';
 import 'package:bluetooth_thermal_printer/bluetooth_thermal_printer.dart';
 import 'package:esc_pos_utils/esc_pos_utils.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:kauveryhospital/screens/flutterposprinter.dart';
 
 import 'package:kauveryhospital/screens/pos_print.dart';
 import 'package:kauveryhospital/screens/token.dart';
@@ -129,6 +129,8 @@ class _MyAppState extends State<MyApp> {
     List<int> bytes = [];
     CapabilityProfile profile = await CapabilityProfile.load();
     final generator = Generator(PaperSize.mm80, profile);
+
+
 
     bytes += generator.text("Demo Shop",
         styles: PosStyles(
@@ -431,8 +433,8 @@ class Main extends StatelessWidget {
                    // print("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT${token}");
                    //await SignalR();
                     //await signalR.connect();
+                           await IsBluethoothEnabled(context,token);
 
-                    Navigator.push(context, MaterialPageRoute(builder: (context) =>  PrintingWidget(currenttoken:token)),);
                     // Navigator.push(context, MaterialPageRoute(builder: (context) =>  PrintingWidget(currenttoken: '1',
                     // )),);
                   }, child: Container(
@@ -503,6 +505,40 @@ class Main extends StatelessWidget {
       ),
     );
   }
+   IsBluethoothEnabled(context,token)async{
+     print("FLUTTER BLUE CHECK");
+     showAlertDialog(BuildContext context) {
+
+       // set up the button
+       Widget okButton = TextButton(
+         child: Text("OK"),
+         onPressed: () {
+          Navigator.pop(context);
+         },
+       );
+
+       // set up the AlertDialog
+       AlertDialog alert = AlertDialog(
+         title: Text("Bluetooth"),
+         content: Text("Please enable Bluetooth before generating token"),
+         actions: [
+           okButton,
+         ],
+       );
+
+       // show the dialog
+       showDialog(
+         context: context,
+         builder: (BuildContext context) {
+           return alert;
+         },
+       );
+     }
+     FlutterBluePlus flutterBlue = FlutterBluePlus.instance;
+     bool on =await flutterBlue.isOn;
+     print("ONNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN$on");
+     await flutterBlue.isOn? {Navigator.push(context, MaterialPageRoute(builder: (context) =>  PrintingWidget(currenttoken:token)),)}:showAlertDialog(context);
+   }
 }
 
 class Home extends StatefulWidget {
@@ -548,4 +584,6 @@ class _HomeState extends State<Home> {
       ),
     );
   }
+
+
 }
