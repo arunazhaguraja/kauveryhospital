@@ -39,7 +39,7 @@ dependencies:
 
   url_launcher: ^6.1.6
   qr_flutter: ^4.0.0
-  syncfusion_flutter_barcodes: ^20.3.57
+
   intl: ^0.17.0
   dotted_border: ^2.0.0+3
   path_provider: ^2.0.11
@@ -68,6 +68,8 @@ dependencies:
 
   web_view_tts: ^0.0.1
   flutter_inappwebview: ^5.4.3+7
+
+  syncfusion_flutter_barcodes: 20.4.44
 
 
 

@@ -7,6 +7,7 @@ import 'package:esc_pos_utils/esc_pos_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_custom_tabs/flutter_custom_tabs.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:image/image.dart' as img;
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:syncfusion_flutter_barcodes/barcodes.dart';
@@ -91,26 +92,40 @@ class _PrintingWidgetState extends State<PrintingWidget> {
     return imgFile.path;
   }
 
+
   void printWithDevice(BluetoothDevice device) async {
     await device.connect();
     final gen = Generator(PaperSize.mm58, await CapabilityProfile.load());
     final printer = BluePrint();
     print("PPPPPPPPPPPPPPPPPPPPPPP ${printer.toString()}");
-    //printer.add(gen.hr());
-    //printer.add(gen.image(getSetImage()));
+    var imgflieename=await getSetImage();
+    print("Image Name $imgflieename");
+    //final ByteData data = await rootBundle.load(imgflieename);
+    // final Uint8List? bytes =  await controller.capture();
+    // final img.Image image = img.decodeImage(bytes!)!;
+    // printer.add(gen.imageRaster(image));
 
-    printer.add(gen.text(widget.currenttoken.toString(),
-        styles: PosStyles(height: PosTextSize.size8)));
-    printer.add(
-      gen.qrcode('${widget.currenttoken} ${now.toString()}',
-          size: QRSize.Size8),
-    );
-    //var currenttokendatenow = '${widget.currenttoken} ${now.toString()}'.split(',');
-    //printer.add(gen.barcode(Barcode.code39([currenttokendatenow])));
-    printer.add(gen.barcode(Barcode.code39(widget.currenttoken.tolist())));
     printer.add(
       gen.text(
-        '${widget.currenttoken} ${now.toString()}',
+          '${widget.currenttoken}',
+          styles:  PosStyles(align: PosAlign.center,bold: true,)
+      ),
+    );
+    // printer.add(
+    //   gen.qrcode('${widget.currenttoken} ${now.toString()}',
+    //       size: QRSize.Size8),
+    // );
+    print( '${widget.currenttoken} ${now.toString()}');
+    List<String> currenttokendatenow = '${widget.currenttoken.toString()}${nowTime.toString()}'.split('');
+    print( 'CCCCCCCCCCCCCCCCCCCCC$currenttokendatenow');
+    printer.add(gen.barcode(Barcode.code39([1,2,3])));
+    // printer.add(gen.barcode(Barcode.code39([1,2,3])));
+    printer.add(gen.emptyLines(1));
+
+    printer.add(
+      gen.text(
+        '${now.toString()}',
+        styles:  PosStyles(height: PosTextSize.size4,align: PosAlign.center)
       ),
     );
     //printer.add(gen.feed(1));
@@ -124,6 +139,7 @@ class _PrintingWidgetState extends State<PrintingWidget> {
   }
 
   final now = DateFormat("dd-MM-yyyy HH:mm:ss").format(DateTime.now());
+  final nowTime =DateFormat("ddMMyyyyHHmm").format(DateTime.now());
   @override
   late WV.WebViewController _controller;
 
@@ -284,7 +300,6 @@ class _PrintingWidgetState extends State<PrintingWidget> {
   }
 
   AutoSelectandprintToken() {
-    List dummylsit = [1, 2];
     bool found = false;
     int k = 0;
     found?null:Timer.periodic(Duration(seconds: 2), (timer) {
@@ -295,8 +310,9 @@ class _PrintingWidgetState extends State<PrintingWidget> {
         for (int i = 0; i < (scanResult!.length); i++) {
           print(
               "SSSSSSSSSSSSSSSSSSSSSSSSS${scanResult![i].device.id.id.toString()}");
-          if ('${scanResult![i].device.id.id}' == '03:12:44:DAA:57:3C') {
+          if ('${scanResult![i].device.id.id}' == '03:12:44:DA:57:3C') {
             found = true;
+            scanResult![i].device.disconnect();
             printWithDevice(scanResult![i].device);
             timer.cancel();
             break;
