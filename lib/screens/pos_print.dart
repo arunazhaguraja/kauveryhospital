@@ -94,43 +94,56 @@ class _PrintingWidgetState extends State<PrintingWidget> {
 
 
   void printWithDevice(BluetoothDevice device) async {
+    List<int> bytes = [];
     await device.connect();
-    final gen = Generator(PaperSize.mm58, await CapabilityProfile.load());
+    final gen = Generator(PaperSize.mm80, await CapabilityProfile.load());
     final printer = BluePrint();
-    print("PPPPPPPPPPPPPPPPPPPPPPP ${printer.toString()}");
-    var imgflieename=await getSetImage();
-    print("Image Name $imgflieename");
+
+    final List<int> barData = [1, 2, 3, 4];
+    //bytes += gen.barcode(Barcode.upcA(barData));
+    //printer.add(gen.barcode(Barcode.code39(barData)));
+
+    // print("PPPPPPPPPPPPPPPPPPPPPPP ${printer.toString()}");
+    // var imgflieename=await getSetImage();
+    // print("Image Name $imgflieename");
     //final ByteData data = await rootBundle.load(imgflieename);
     // final Uint8List? bytes =  await controller.capture();
     // final img.Image image = img.decodeImage(bytes!)!;
     // printer.add(gen.imageRaster(image));
-
-    printer.add(
-      gen.text(
-          '${widget.currenttoken}',
-          styles:  PosStyles(align: PosAlign.center,bold: true,)
-      ),
-    );
+printer.add(gen.text('${widget.currenttoken}',
+    styles: PosStyles(
+      align: PosAlign.center,
+      height: PosTextSize.size2,
+      width: PosTextSize.size2,
+    ),
+    linesAfter: 1));
     // printer.add(
-    //   gen.qrcode('${widget.currenttoken} ${now.toString()}',
-    //       size: QRSize.Size8),
+    //   gen.text(
+    //       '${widget.currenttoken}',
+    //       styles:  PosStyles(align: PosAlign.center,bold: true,)
+    //   ),
     // );
-    print( '${widget.currenttoken} ${now.toString()}');
-    List<String> currenttokendatenow = '${widget.currenttoken.toString()}${nowTime.toString()}'.split('');
-    print( 'CCCCCCCCCCCCCCCCCCCCC$currenttokendatenow');
-    printer.add(gen.barcode(Barcode.code39([1,2,3])));
-    // printer.add(gen.barcode(Barcode.code39([1,2,3])));
+    printer.add(
+      gen.qrcode('${widget.currenttoken} ${now.toString()}',
+          size: QRSize.Size8,align: PosAlign.center),
+    );
+    // print( '${widget.currenttoken} ${now.toString()}');
+    // List<String> currenttokendatenow = '${widget.currenttoken.toString()}'.split('');
+    // print( 'CCCCCCCCCCCCCCCCCCCCC$currenttokendatenow');
+    //printer.add(gen.barcode(Barcode.code39([1,2,3]),textPos:BarcodeText.none, ));
+    //printer.add(gen.barcode(Barcode.code39(currenttokendatenow),textPos: BarcodeText.none));
+    //printer.add(gen.barcode(Barcode.code39([1,2,3])));
     printer.add(gen.emptyLines(1));
 
     printer.add(
       gen.text(
         '${now.toString()}',
-        styles:  PosStyles(height: PosTextSize.size4,align: PosAlign.center)
+        styles:  PosStyles(align: PosAlign.center)
       ),
     );
     //printer.add(gen.feed(1));
     printer.add(gen.cut());
-    print("PPPPPPPPPPPPPPPPPPPPPPP ${printer.toString()}");
+    print("PPPPPPPPPPPPPPPPPPPPPPP ${printer._data.toString()}");
     await printer.printData(device);
 
     device.disconnect();
@@ -139,7 +152,7 @@ class _PrintingWidgetState extends State<PrintingWidget> {
   }
 
   final now = DateFormat("dd-MM-yyyy HH:mm:ss").format(DateTime.now());
-  final nowTime =DateFormat("ddMMyyyyHHmm").format(DateTime.now());
+  final nowTime =DateFormat("ddMMHHmm").format(DateTime.now());
   @override
   late WV.WebViewController _controller;
 
