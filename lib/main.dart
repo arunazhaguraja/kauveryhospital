@@ -417,23 +417,28 @@ class Main extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+Expanded(flex:3,
+  child:Image.asset("asset/Kauvery_Logo.png",),
+),
 
-                  Image.asset("asset/Kauvery_Logo.png"),
                   Container(
                     color: Color(0xffc01c7b),
                    // width: MediaQuery.of(context).size.width,
                     width: double.infinity,
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: Center(child: Text("Token Generate",style: TextStyle(backgroundColor: Color(0xffc01c7b),color: Colors.white ),)),
+                      child: Center(child: Column(children:[
+                          Text("",style: TextStyle(backgroundColor: Color(0xffc01c7b),color: Colors.white ),),
+                          Text("",style: TextStyle(backgroundColor: Color(0xffc01c7b),color: Colors.white ),)
+                      ])),
                     ),
                   ),
-                  TextButton(onPressed: ()async{
-                   var token=await ApiHelper().GetToken();
-                   // print("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT${token}");
-                   //await SignalR();
+                  Expanded(flex:4,child: TextButton(onPressed: ()async{
+                    var token=await ApiHelper().GetToken();
+                    // print("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT${token}");
+                    //await SignalR();
                     //await signalR.connect();
-                           await IsBluethoothEnabled(context,token);
+                    await IsBluethoothEnabled(context,token);
 
                     // Navigator.push(context, MaterialPageRoute(builder: (context) =>  PrintingWidget(currenttoken: '1',
                     // )),);
@@ -445,10 +450,21 @@ class Main extends StatelessWidget {
                     ),
 
                     child: Padding(
-                      padding: const EdgeInsets.all(100.0),
-                      child: Text("Generate Token",style: TextStyle(color: Color(0xffc01c7b),fontSize: 20,),),
+                        padding: const EdgeInsets.symmetric(vertical: 0.0,horizontal: 0),
+                        child: Center(child:Column(
+                          children: [
+                            Spacer(),
+                            Text("Press to",style: TextStyle(color: Color(0xffc01c7b),fontSize: MediaQuery.of(context).size.width/11,),textAlign: TextAlign.center,),
+                            Text("generate token",style: TextStyle(color: Color(0xffc01c7b),fontSize: MediaQuery.of(context).size.width/11,),textAlign: TextAlign.center,),
+                            SizedBox(height: 40,),
+                            Text("டோக்கனை உருவாக்க அழுத்தவும்",style: TextStyle(color: Color(0xffc01c7b),fontSize: MediaQuery.of(context).size.width/11,),textAlign: TextAlign.center,),
+                            Spacer(),
+                          ],
+                        ),)
                     ),
-                  )),
+                  )),),
+                  Expanded(flex:1,child: SizedBox()),
+
                   // Container(
                   //   padding: EdgeInsets.all(20),
                   //   child: Column(
