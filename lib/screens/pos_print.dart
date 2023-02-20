@@ -92,7 +92,6 @@ class _PrintingWidgetState extends State<PrintingWidget> {
     return imgFile.path;
   }
 
-
   void printWithDevice(BluetoothDevice device) async {
     List<int> bytes = [];
     await device.connect();
@@ -110,13 +109,13 @@ class _PrintingWidgetState extends State<PrintingWidget> {
     // final Uint8List? bytes =  await controller.capture();
     // final img.Image image = img.decodeImage(bytes!)!;
     // printer.add(gen.imageRaster(image));
-printer.add(gen.text('${widget.currenttoken}',
-    styles: PosStyles(
-      align: PosAlign.center,
-      height: PosTextSize.size2,
-      width: PosTextSize.size2,
-    ),
-    linesAfter: 1));
+    printer.add(gen.text('${widget.currenttoken}',
+        styles: PosStyles(
+          align: PosAlign.center,
+          height: PosTextSize.size2,
+          width: PosTextSize.size2,
+        ),
+        linesAfter: 1));
     // printer.add(
     //   gen.text(
     //       '${widget.currenttoken}',
@@ -125,7 +124,7 @@ printer.add(gen.text('${widget.currenttoken}',
     // );
     printer.add(
       gen.qrcode('${widget.currenttoken} ${now.toString()}',
-          size: QRSize.Size8,align: PosAlign.center),
+          size: QRSize.Size8, align: PosAlign.center),
     );
     // print( '${widget.currenttoken} ${now.toString()}');
     // List<String> currenttokendatenow = '${widget.currenttoken.toString()}'.split('');
@@ -136,23 +135,22 @@ printer.add(gen.text('${widget.currenttoken}',
     printer.add(gen.emptyLines(1));
 
     printer.add(
-      gen.text(
-        '${now.toString()}',
-        styles:  PosStyles(align: PosAlign.center)
-      ),
+      gen.text('${now.toString()}', styles: PosStyles(align: PosAlign.center)),
     );
     //printer.add(gen.feed(1));
     printer.add(gen.cut());
     print("PPPPPPPPPPPPPPPPPPPPPPP ${printer._data.toString()}");
+    showAboutDialog(context: context);
     await printer.printData(device);
 
     device.disconnect();
+    Navigator.pop(context);
     Navigator.pushReplacement(
         context, MaterialPageRoute(builder: (c) => Main()));
   }
 
   final now = DateFormat("dd-MM-yyyy HH:mm:ss").format(DateTime.now());
-  final nowTime =DateFormat("ddMMHHmm").format(DateTime.now());
+  final nowTime = DateFormat("ddMMHHmm").format(DateTime.now());
   @override
   late WV.WebViewController _controller;
 
@@ -164,8 +162,42 @@ printer.add(gen.text('${widget.currenttoken}',
 
   bool onTapped = false;
 
+  showAlertDialog(BuildContext context) {
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      contentPadding: EdgeInsets.zero,
+      content: Container(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            SizedBox(
+              height: MediaQuery.of(context).size.height / 5,
+            ),
+            Center(
+              child: CircularProgressIndicator(),
+            ),
+            Text("Printing..."),
+            SizedBox(
+              height: MediaQuery.of(context).size.height / 5,
+            ),
+          ],
+        ),
+      ),
+    );
+
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
   Widget build(BuildContext context) {
-    //AutoSelectandprintToken();
+    //showAlertDialog(context);
     return Scaffold(
       key: _scaffoldKey,
       body: SafeArea(
@@ -315,32 +347,33 @@ printer.add(gen.text('${widget.currenttoken}',
   AutoSelectandprintToken() {
     bool found = false;
     int k = 0;
-    found?null:Timer.periodic(Duration(seconds: 2), (timer) {
-
-      if (scanResult == null) {
-        print("NOPPPPEE");
-      } else {
-        for (int i = 0; i < (scanResult!.length); i++) {
-          print(
-              "SSSSSSSSSSSSSSSSSSSSSSSSS${scanResult![i].device.id.id.toString()}");
-          if ('${scanResult![i].device.id.id}' == '03:12:44:DA:57:3C') {
-            found = true;
-            scanResult![i].device.disconnect();
-            printWithDevice(scanResult![i].device);
-            timer.cancel();
-            break;
-          }
-        }
-        k++;
-
-        found
-            ? {
-                ScaffoldMessenger.of(context)
-                    .showSnackBar(SnackBar(content: Text('Printing')))
+    found
+        ? null
+        : Timer.periodic(Duration(seconds: 2), (timer) {
+            if (scanResult == null) {
+              print("NOPPPPEE");
+            } else {
+              for (int i = 0; i < (scanResult!.length); i++) {
+                print(
+                    "SSSSSSSSSSSSSSSSSSSSSSSSS${scanResult![i].device.id.id.toString()}");
+                if ('${scanResult![i].device.id.id}' == '03:12:44:DA:57:3C') {
+                  found = true;
+                  scanResult![i].device.disconnect();
+                  printWithDevice(scanResult![i].device);
+                  timer.cancel();
+                  break;
+                }
               }
-            : null;
-      }
-    });
+              k++;
+
+              found
+                  ? {
+                      ScaffoldMessenger.of(context)
+                          .showSnackBar(SnackBar(content: Text('Printing')))
+                    }
+                  : null;
+            }
+          });
   }
 
   _launchURL(BuildContext context) async {
