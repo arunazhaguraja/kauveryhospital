@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:io';
 
-
 import 'package:bluetooth_thermal_printer/bluetooth_thermal_printer.dart';
 import 'package:esc_pos_utils/esc_pos_utils.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
@@ -19,9 +19,7 @@ import 'package:signalr_netcore/hub_connection_builder.dart';
 import 'package:signalr_netcore/itransport.dart';
 import 'package:web_view_tts/web_view_tts.dart';
 
-
 import 'api/tokenAPI.dart';
-
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -39,7 +37,7 @@ Future main() async {
 
     if (swAvailable && swInterceptAvailable) {
       AndroidServiceWorkerController serviceWorkerController =
-      AndroidServiceWorkerController.instance();
+          AndroidServiceWorkerController.instance();
 
       await serviceWorkerController
           .setServiceWorkerClient(AndroidServiceWorkerClient(
@@ -59,8 +57,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-
-
   bool connected = false;
   List availableBluetoothDevices = [];
 
@@ -113,7 +109,6 @@ class _MyAppState extends State<MyApp> {
     // Print QR Code using native function
     bytes += generator.qrcode('example.com');
 
-
     bytes += generator.hr();
 
     // Print Barcode using native function
@@ -129,8 +124,6 @@ class _MyAppState extends State<MyApp> {
     List<int> bytes = [];
     CapabilityProfile profile = await CapabilityProfile.load();
     final generator = Generator(PaperSize.mm80, profile);
-
-
 
     bytes += generator.text("Demo Shop",
         styles: PosStyles(
@@ -279,327 +272,274 @@ class _MyAppState extends State<MyApp> {
     return bytes;
   }
 
-
   InAppWebViewController? webViewController;
 
   onLoadStart(controller) async {
     await WebViewTTS.init(controller: controller);
-
   }
+
   @override
   Widget build(BuildContext context) {
-    return  MaterialApp(
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
-       home: Scaffold(
-         body: Stack(
-           children: [
-             InAppWebView(
-                 initialUrlRequest: URLRequest(url: Uri.parse("http://signalr.timesmed.com/Login/KaveriLogin")),
-
-                 onLoadStart: (cntrl, url) => onLoadStart(cntrl),
-                 initialOptions: InAppWebViewGroupOptions(
-                     android: AndroidInAppWebViewOptions(
-                       useHybridComposition: true,
-                       allowContentAccess: true,
-                     )),
-                 androidOnPermissionRequest: (InAppWebViewController controller, String origin, List<String> resources) async {
-                   return PermissionRequestResponse(resources: resources, action: PermissionRequestResponseAction.GRANT);
-                 }
-
-             ),
-             Main(),
-           ],
-         ),
-       ),
+      home: Scaffold(
+        body: Stack(
+          children: [
+            InAppWebView(
+                initialUrlRequest: URLRequest(
+                    url: Uri.parse(
+                        "http://signalr.timesmed.com/Login/KaveriLogin")),
+                onLoadStart: (cntrl, url) => onLoadStart(cntrl),
+                initialOptions: InAppWebViewGroupOptions(
+                    android: AndroidInAppWebViewOptions(
+                  useHybridComposition: true,
+                  allowContentAccess: true,
+                )),
+                androidOnPermissionRequest: (InAppWebViewController controller,
+                    String origin, List<String> resources) async {
+                  return PermissionRequestResponse(
+                      resources: resources,
+                      action: PermissionRequestResponseAction.GRANT);
+                }),
+            Main(),
+          ],
+        ),
+      ),
     );
   }
 }
 
-class Main extends StatelessWidget {
-   Main({
+class Main extends StatefulWidget {
+  Main({
     Key? key,
   }) : super(key: key);
 
-  // SignalrSocket signalrSocket = SignalrSocket(
-  //   url: 'http://signalr.timesmed.com/',
-  //   hubName: 'chatHub',
-  //   eventName: 'addNewMessageToPage',
-  //   queryString: {'key': 'value'},
-  //   updateConnectionStatus: (status) {
-  //     debugPrint("signalr socket update connection status ${status.name}");
-  //   },
-  //   newMessage: (message) {
-  //     debugPrint("signalr socket new message $message");
-  //   },
-  // );
-   // Import the library.
+  @override
+  State<Main> createState() => _MainState();
+}
 
-   // SignalR signalR = SignalR(
-   //
-   //     'http://signalr.timesmed.com/signalr/hubs',
-   //
-   //     "hubs",
-   //     hubMethods: ["addNewMessageToPage"],
-   //     statusChangeCallback: (status) => print("STAUTSSSSSSSSSS$status"),
-   // //transport: Transport.longPolling,
-   //
-   // hubCallback: (methodName, message) => print('MethodName = $methodName, Message = $message'));
+class _MainState extends State<Main> {
+  InAppWebViewController? webViewController;
 
-   SignalR()async{
-     // The location of the SignalR Server.
-     final serverUrl = "http://signalr.timesmed.com/signalr/hubs";
-// Creates the connection by using the HubConnectionBuilder.
+  onLoadStart(controller) async {
+    await WebViewTTS.init(controller: controller);
+  }
 
-     final hubConnection = HubConnectionBuilder().withUrl(serverUrl,
-         options: HttpConnectionOptions(
-                     skipNegotiation: true,
-                     transport: HttpTransportType.WebSockets,
-                 ),
-         //transportType: HttpTransportType.WebSockets
+  bool isGenerateTokenClicked = false;
+@override
+  void initState() {
+  isGenerateTokenClicked = false;
+    super.initState();
+  }
 
-     ).build();
-// When the connection is closed, print out a message to the console.
-     await hubConnection.start();
-     //hubConnection.onclose( ({error}) => {print("OnCLOSE ERROR $error")},);
 
-   }
-
-  // SignalR()async{
-  //   final connection =new  HubConnectionBuilder().withUrl('wss://signalr.timesmed.com/signalr/hubs',
-  //       options: HttpConnectionOptions(
-  //           skipNegotiation: true,
-  //           transport: HttpTransportType.WebSockets,
-  //
-  //       ),
-  //       //transportType: HttpTransportType.ServerSentEvents,
-  //   ).build();
-  //
-  //   await connection.start();
-  //
-  //   // connection.on('ReceiveMessage', (message) {
-  //   //   print(message.toString());
-  //   // });
-  //
-  //  // await connection.invoke('SendMessage', args: ['Bob', 'Says hi!']);
-  // }
-
-   InAppWebViewController? webViewController;
-
-   onLoadStart(controller) async {
-     await WebViewTTS.init(controller: controller);
-
-   }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child:
-        Stack(
-          children: [
-            // InAppWebView(
-            //     initialUrlRequest: URLRequest(url: Uri.parse("http://signalr.timesmed.com/Login/KaveriLogin")),
-            //
-            //     onLoadStart: (cntrl, url) => onLoadStart(cntrl),
-            //     initialOptions: InAppWebViewGroupOptions(
-            //         android: AndroidInAppWebViewOptions(
-            //           useHybridComposition: true,
-            //           allowContentAccess: true,
-            //         )),
-            //     androidOnPermissionRequest: (InAppWebViewController controller, String origin, List<String> resources) async {
-            //       return PermissionRequestResponse(resources: resources, action: PermissionRequestResponseAction.GRANT);
-            //     }
-            //
-            // ),
-            Container(
-              color: Colors.white,
-              width: double.infinity,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-Expanded(flex:3,
-  child:Image.asset("asset/Kauvery_Logo.png",),
-),
-
-                  Container(
-                    color: Color(0xffc01c7b),
-                   // width: MediaQuery.of(context).size.width,
-                    width: double.infinity,
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Center(child: Column(children:[
-                          Text("",style: TextStyle(backgroundColor: Color(0xffc01c7b),color: Colors.white ),),
-                          Text("",style: TextStyle(backgroundColor: Color(0xffc01c7b),color: Colors.white ),)
-                      ])),
-                    ),
-                  ),
-                  Expanded(flex:4,child: TextButton(onPressed: ()async{
-                    var token=await ApiHelper().GetToken();
-                    // print("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT${token}");
-                    //await SignalR();
-                    //await signalR.connect();
-                    await IsBluethoothEnabled(context,token);
-
-                    // Navigator.push(context, MaterialPageRoute(builder: (context) =>  PrintingWidget(currenttoken: '1',
-                    // )),);
-                  }, child: Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Color(0xffc01c7b)),
-                      color: Color(0xffffcf78),
-                      borderRadius: BorderRadius.circular(3),
-                    ),
-
-                    child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 0.0,horizontal: 0),
-                        child: Center(child:Column(
-                          children: [
-                            Spacer(),
-                            Text("Press to",style: TextStyle(color: Color(0xffc01c7b),fontSize: MediaQuery.of(context).size.width/11,),textAlign: TextAlign.center,),
-                            Text("generate token",style: TextStyle(color: Color(0xffc01c7b),fontSize: MediaQuery.of(context).size.width/11,),textAlign: TextAlign.center,),
-                            SizedBox(height: 40,),
-                            Text("டோக்கனை உருவாக்க அழுத்தவும்",style: TextStyle(color: Color(0xffc01c7b),fontSize: MediaQuery.of(context).size.width/11,),textAlign: TextAlign.center,),
-                            Spacer(),
-                          ],
-                        ),)
-                    ),
-                  )),),
-                  Expanded(flex:1,child: SizedBox()),
-
-                  // Container(
-                  //   padding: EdgeInsets.all(20),
-                  //   child: Column(
-                  //     children: [
-                  //       Text("Search Paired Bluetooth"),
-                  //       TextButton(
-                  //         onPressed: () {
-                  //           this.getBluetooth();
-                  //         },
-                  //         child: Text("Search"),
-                  //       ),
-                  //       Container(
-                  //         height: 100,
-                  //         child: ListView.builder(
-                  //           itemCount: availableBluetoothDevices.length > 0
-                  //               ? availableBluetoothDevices.length
-                  //               : 0,
-                  //           itemBuilder: (context, index) {
-                  //             return ListTile(
-                  //               onTap: () {
-                  //                 String select = availableBluetoothDevices[index];
-                  //                 List list = select.split("#");
-                  //                 // String name = list[0];
-                  //                 String mac = list[1];
-                  //                 this.setConnect(mac);
-                  //               },
-                  //               title: Text('${availableBluetoothDevices[index]}'),
-                  //               subtitle: Text("Click to connect"),
-                  //             );
-                  //           },
-                  //         ),
-                  //       ),
-                  //       SizedBox(
-                  //         height: 30,
-                  //       ),
-                  //       TextButton(
-                  //         onPressed: connected ? this.printGraphics : null,
-                  //         child: Text("Print"),
-                  //       ),
-                  //       TextButton(
-                  //         onPressed: connected ? this.printTicket : null,
-                  //         child: Text("Print Ticket"),
-                  //       ),
-                  //     ],
-                  //   ),
-                  // ),
-                ],
-
-              ),
-            ),
-          ],
-        ),
-
-      ),
-    );
-  }
-   IsBluethoothEnabled(context,token)async{
-     print("FLUTTER BLUE CHECK");
-     showAlertDialog(BuildContext context) {
-
-       // set up the button
-       Widget okButton = TextButton(
-         child: Text("OK"),
-         onPressed: () {
-          Navigator.pop(context);
-         },
-       );
-
-       // set up the AlertDialog
-       AlertDialog alert = AlertDialog(
-         title: Text("Bluetooth"),
-         content: Text("Please enable Bluetooth before generating token"),
-         actions: [
-           okButton,
-         ],
-       );
-
-       // show the dialog
-       showDialog(
-         context: context,
-         builder: (BuildContext context) {
-           return alert;
-         },
-       );
-     }
-     FlutterBluePlus flutterBlue = FlutterBluePlus.instance;
-     bool on =await flutterBlue.isOn;
-     print("ONNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN$on");
-     await flutterBlue.isOn? {Navigator.push(context, MaterialPageRoute(builder: (context) =>  PrintingWidget(currenttoken:token)),)}:showAlertDialog(context);
-   }
-}
-
-class Home extends StatefulWidget {
-  const Home({Key? key}) : super(key: key);
-
-  @override
-  State<Home> createState() => _HomeState();
-}
-
-class _HomeState extends State<Home> {
-  @override
-  Widget build(BuildContext context) {
-    return
-      Scaffold(
-      body: SafeArea(
-        child:
-        Container(
-          width: MediaQuery.of(context).size.width,
+        child:isGenerateTokenClicked?Center(child: CupertinoActivityIndicator(radius: MediaQuery.of(context).size.width/4,)): Container(
+          color: Colors.white,
+          width: double.infinity,
           child: Column(
-           crossAxisAlignment: CrossAxisAlignment.center,
-           mainAxisAlignment: MainAxisAlignment.center,
-           children: [
-             Image.asset("asset/Kauvery_Logo.png"),
-             Container(
-               color: Color(0xffc01c7b),
-                 width: MediaQuery.of(context).size.width,
-               child: Padding(
-                 padding: const EdgeInsets.all(8.0),
-                 child: Center(child: Text("Token Generate",style: TextStyle(backgroundColor: Color(0xffc01c7b),color: Colors.white ),)),
-               ),
-             ),
-             TextButton(onPressed: (){}, child: Container(
-               color: Color(0xffffcf78),
-               child: Padding(
-                 padding: const EdgeInsets.all(50.0),
-                 child: Text("Generate Token",style: TextStyle(color: Color(0xffc01c7b),),),
-               ),
-             ))
-           ],
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Expanded(
+                flex: 3,
+                child: Image.asset(
+                  "asset/Kauvery_Logo.png",
+                ),
+              ),
 
+              Container(
+                color: Color(0xffc01c7b),
+                // width: MediaQuery.of(context).size.width,
+                width: double.infinity,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Center(
+                      child: Column(children: [
+                    Text(
+                      "",
+                      style: TextStyle(
+                          backgroundColor: Color(0xffc01c7b),
+                          color: Colors.white),
+                    ),
+                    Text(
+                      "",
+                      style: TextStyle(
+                          backgroundColor: Color(0xffc01c7b),
+                          color: Colors.white),
+                    )
+                  ])),
+                ),
+              ),
+              Expanded(
+                flex: 4,
+                child: TextButton(
+                    onPressed: isGenerateTokenClicked == false
+                        ? () async {
+                            setState(() {
+                              isGenerateTokenClicked = true;
+                            });
+                            var token = await ApiHelper().GetToken();
+                            await IsBluethoothEnabled(context, token);
+                          }
+                        : () {
+                            print(isGenerateTokenClicked);
+                          },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Color(0xffc01c7b)),
+                        color: Color(0xffffcf78),
+                        borderRadius: BorderRadius.circular(3),
+                      ),
+                      child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 0.0, horizontal: 0),
+                          child: Center(
+                            child: Column(
+                              children: [
+                                Spacer(),
+                                Text(
+                                  "Tap once to",
+                                  style: TextStyle(
+                                    color: Color(0xffc01c7b),
+                                    fontSize:
+                                        MediaQuery.of(context).size.width /
+                                            11,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                                Text(
+                                  "collect token",
+                                  style: TextStyle(
+                                    color: Color(0xffc01c7b),
+                                    fontSize:
+                                        MediaQuery.of(context).size.width /
+                                            11,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                                SizedBox(
+                                  height: 40,
+                                ),
+                                Text(
+                                  "டோக்கனை சேகரிக்க ஒருமுறை தட்டவும்",
+                                  style: TextStyle(
+                                    color: Color(0xffc01c7b),
+                                    fontSize:
+                                        MediaQuery.of(context).size.width /
+                                            11,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                                Spacer(),
+                              ],
+                            ),
+                          )),
+                    )),
+              ),
+              Expanded(flex: 1, child: SizedBox()),
+
+              // Container(
+              //   padding: EdgeInsets.all(20),
+              //   child: Column(
+              //     children: [
+              //       Text("Search Paired Bluetooth"),
+              //       TextButton(
+              //         onPressed: () {
+              //           this.getBluetooth();
+              //         },
+              //         child: Text("Search"),
+              //       ),
+              //       Container(
+              //         height: 100,
+              //         child: ListView.builder(
+              //           itemCount: availableBluetoothDevices.length > 0
+              //               ? availableBluetoothDevices.length
+              //               : 0,
+              //           itemBuilder: (context, index) {
+              //             return ListTile(
+              //               onTap: () {
+              //                 String select = availableBluetoothDevices[index];
+              //                 List list = select.split("#");
+              //                 // String name = list[0];
+              //                 String mac = list[1];
+              //                 this.setConnect(mac);
+              //               },
+              //               title: Text('${availableBluetoothDevices[index]}'),
+              //               subtitle: Text("Click to connect"),
+              //             );
+              //           },
+              //         ),
+              //       ),
+              //       SizedBox(
+              //         height: 30,
+              //       ),
+              //       TextButton(
+              //         onPressed: connected ? this.printGraphics : null,
+              //         child: Text("Print"),
+              //       ),
+              //       TextButton(
+              //         onPressed: connected ? this.printTicket : null,
+              //         child: Text("Print Ticket"),
+              //       ),
+              //     ],
+              //   ),
+              // ),
+            ],
           ),
         ),
       ),
     );
   }
 
+  IsBluethoothEnabled(context, token) async {
+    print("FLUTTER BLUE CHECK");
+    showAlertDialog(BuildContext context) {
+      // set up the button
+      Widget okButton = TextButton(
+        child: Text("OK"),
+        onPressed: () {
+          Navigator.pop(context);
+        },
+      );
 
+      // set up the AlertDialog
+      AlertDialog alert = AlertDialog(
+        title: Text("Bluetooth"),
+        content: Text("Please enable Bluetooth before generating token"),
+        actions: [
+          okButton,
+        ],
+      );
+
+      // show the dialog
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return alert;
+        },
+      );
+    }
+
+    FlutterBluePlus flutterBlue = FlutterBluePlus.instance;
+    bool on = await flutterBlue.isOn;
+    print("ONNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN$on");
+    if(on)
+        {
+             await Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => PrintingWidget(currenttoken: token)),
+            );
+             setState(() {
+               isGenerateTokenClicked=false;
+             });
+
+          }
+       else{ showAlertDialog(context);}
+  }
 }
+
