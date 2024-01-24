@@ -223,7 +223,7 @@ class _PrintingWidgetState extends State<PrintingWidget> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                widget.currenttoken,
+                                widget.currenttoken.toString(),
                                 style: TextStyle(
                                     fontSize:
                                         MediaQuery.of(context).size.height / 5),
@@ -385,7 +385,9 @@ class _PrintingWidgetState extends State<PrintingWidget> {
               for (int i = 0; i < (scanResult!.length); i++) {
                 print(
                     "SSSSSSSSSSSSSSSSSSSSSSSSS${scanResult![i].device.id.id.toString()}");
-                if ('${scanResult![i].device.id.id}' == '03:12:44:DA:57:3C') {
+                final ip= '03:12:44:DA:57:3C';
+                //final ip='DC:0D:30:01:B1:AA';
+                if ('${scanResult![i].device.id.id}' == ip) {
                   found = true;
                   scanResult![i].device.disconnect();
                   timer.cancel();
