@@ -385,8 +385,10 @@ class _PrintingWidgetState extends State<PrintingWidget> {
               for (int i = 0; i < (scanResult!.length); i++) {
                 print(
                     "SSSSSSSSSSSSSSSSSSSSSSSSS${scanResult![i].device.id.id.toString()}");
-                final ip= '03:12:44:DA:57:3C';
-                //final ip='DC:0D:30:01:B1:AA';
+                //Kavery alwarpet
+                //final ip= '03:12:44:DA:57:3C';
+                //Kavery trichy
+                final ip='DC:0D:30:01:B1:AA';
                 if ('${scanResult![i].device.id.id}' == ip) {
                   found = true;
                   scanResult![i].device.disconnect();

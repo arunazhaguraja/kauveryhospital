@@ -9,7 +9,15 @@ class ApiHelper {
 
   //String toekngeturl="http://signalr.timesmed.com/api/webapi/GetTokens";
   //String toekngeturl='http://testsignalr.timesmed.com//token/generatetoken?deptId=2';
-  String toekngeturl='http://signalr.timesmed.com//token/generatetoken?deptId=1';
+  //Kavery alwarpet prod
+  //String toekngeturl='http://signalr.timesmed.com//token/generatetoken?deptId=1';
+
+  //kavery trichy prod
+  //String toekngeturl='http://signalr.timesmed.com/token/generatetoken?deptId=2';
+
+  //kavery trichy test
+  String toekngeturl='http://testsignalr.timesmed.com//token/generatetoken?deptId=2';
+
 
 
   Future GetToken()async{
