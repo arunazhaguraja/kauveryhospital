@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:kauveryhospital/Consts/consts.dart';
 import 'package:web_view_tts/web_view_tts.dart';
 import 'package:wakelock/wakelock.dart';
 
@@ -19,9 +20,11 @@ void main() async {
 
 class MyApp extends StatelessWidget {
   //Kavery alwarpet prod
-  final String url = "http://signalr.timesmed.com/Login/KaveriLogin";
+  //final String url = "http://signalr.timesmed.com/Login/KaveriLogin";
   //kavery trichy prod
   //final String url = 'http://signalr.timesmed.com/Login/KaveriLogin?user=dashboarduser-tr';
+
+  final String url=Const.webViewURL;
 
   @override
   Widget build(BuildContext context) {
@@ -90,8 +93,16 @@ class _TokenGenerationWidgetState extends State<TokenGenerationWidget> {
         setState(() {
           isGenerateTokenClicked = true;
         });
-        var token = await ApiHelper().GetToken();
-        await IsBluetoothEnabled(context, token);
+        var token = await ApiHelper().getToken(context);
+        if(token ==null)
+          { setState(() {
+            isGenerateTokenClicked = false;
+          });
+
+          }
+        else
+          {
+        await IsBluetoothEnabled(context, token);}
       },
     );
   }
@@ -113,7 +124,10 @@ class _TokenGenerationWidgetState extends State<TokenGenerationWidget> {
         isGenerateTokenClicked = false;
       });
     } else {
-      _showBluetoothAlertDialog(context);
+       _showBluetoothAlertDialog(context);
+      setState(() {
+        isGenerateTokenClicked = false;
+      });
     }
   }
 
@@ -122,12 +136,19 @@ class _TokenGenerationWidgetState extends State<TokenGenerationWidget> {
       child: Text("OK"),
       onPressed: () {
         Navigator.pop(context);
+
       },
     );
 
     AlertDialog alert = AlertDialog(
-      title: Text("Bluetooth"),
-      content: Text("Please enable Bluetooth before generating token"),
+      title: const Text("புளூடூத் | Bluetooth"),
+      content: const Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text("டோக்கனை உருவாக்கும் முன் புளூடூத்தை இயக்கவும்"),
+          Text("Please enable Bluetooth before generating token"),
+        ],
+      ),
       actions: [
         okButton,
       ],
@@ -135,6 +156,7 @@ class _TokenGenerationWidgetState extends State<TokenGenerationWidget> {
 
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (BuildContext context) {
         return alert;
       },
