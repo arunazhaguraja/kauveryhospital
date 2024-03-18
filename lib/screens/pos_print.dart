@@ -24,6 +24,7 @@ import 'dart:io';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 
+import '../Consts/consts.dart';
 import '../main.dart';
 
 class MyChromeSafariBrowser extends ChromeSafariBrowser {
@@ -94,7 +95,7 @@ class _PrintingWidgetState extends State<PrintingWidget> {
   }
 
    printWithDevice(BluetoothDevice device) async {
-    List<int> bytes = [];
+    //List<int> bytes = [];
     await device.connect();
     final gen = Generator(PaperSize.mm80, await CapabilityProfile.load());
     final printer = BluePrint();
@@ -110,6 +111,14 @@ class _PrintingWidgetState extends State<PrintingWidget> {
     // final Uint8List? bytes =  await controller.capture();
     // final img.Image image = img.decodeImage(bytes!)!;
     // printer.add(gen.imageRaster(image));
+
+    // Load the image asset
+    final ByteData imageData = await rootBundle.load('asset/Kauvery_Hospital_logo.png');
+    final Uint8List bytes = imageData.buffer.asUint8List();
+
+    // Add image to the printer
+    printer.add(gen.imageRaster(img.decodeImage(bytes)!));
+
     printer.add(gen.text('${widget.currenttoken}',
         styles: PosStyles(
           align: PosAlign.center,
@@ -134,6 +143,7 @@ class _PrintingWidgetState extends State<PrintingWidget> {
     // printer.add(gen.barcode(Barcode.codabar(currenttokendatenow),textPos: BarcodeText.none));
     //printer.add(gen.barcode(Barcode.code39([1,2,3])));
     printer.add(gen.emptyLines(1));
+
 
     printer.add(
       gen.text('${now.toString()}', styles: PosStyles(align: PosAlign.center)),
@@ -395,7 +405,8 @@ class _PrintingWidgetState extends State<PrintingWidget> {
                 //Kavery alwarpet
                 //final ip= '03:12:44:DA:57:3C';
                 //Kavery trichy
-                final ip='DC:0D:30:01:B1:AA';
+                //final ip='DC:0D:30:01:B1:AA';
+                final ip=Const.printerIp;
                 if ('${scanResult![i].device.id.id}' == ip) {
                   found = true;
                   scanResult![i].device.disconnect();

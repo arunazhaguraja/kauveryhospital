@@ -12,19 +12,22 @@ import 'package:wakelock/wakelock.dart';
 import 'api/tokenAPI.dart';
 import 'screens/pos_print.dart';
 
+//write documentation for the belwo block of code
+//The main function is the entry point of the Flutter application. It calls the runApp function to run the app.
+//The runApp function takes the widget that will be the root of the widget tree as the argument.
+
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   Wakelock.enable();
   runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
-  //Kavery alwarpet prod
-  //final String url = "http://signalr.timesmed.com/Login/KaveriLogin";
-  //kavery trichy prod
-  //final String url = 'http://signalr.timesmed.com/Login/KaveriLogin?user=dashboarduser-tr';
 
+class MyApp extends StatelessWidget {
   final String url=Const.webViewURL;
+
+   MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -49,7 +52,7 @@ class MyApp extends StatelessWidget {
                     action: PermissionRequestResponseAction.GRANT);
               },
             ),
-            MainScreen(),
+            const MainScreen(),
           ],
         ),
       ),
@@ -62,6 +65,8 @@ class MyApp extends StatelessWidget {
 }
 
 class MainScreen extends StatelessWidget {
+  const MainScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -72,6 +77,10 @@ class MainScreen extends StatelessWidget {
   }
 }
 
+
+/// The `TokenGenerationWidget` class in Dart is a StatefulWidget that handles token
+/// generation and checks for Bluetooth status before proceeding with further
+/// actions.
 class TokenGenerationWidget extends StatefulWidget {
   @override
   _TokenGenerationWidgetState createState() => _TokenGenerationWidgetState();
@@ -163,6 +172,10 @@ class _TokenGenerationWidgetState extends State<TokenGenerationWidget> {
     );
   }
 }
+
+/// The `TokenGenerationView` class in Dart represents a widget for generating
+/// tokens with a button to collect the token upon tap.
+
 
 class TokenGenerationView extends StatelessWidget {
   final VoidCallback onPressed;
