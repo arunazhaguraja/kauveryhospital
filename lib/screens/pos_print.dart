@@ -11,6 +11,7 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:image/image.dart' as img;
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:restart_app/restart_app.dart';
 import 'package:syncfusion_flutter_barcodes/barcodes.dart';
 import 'package:web_view_tts/web_view_tts.dart';
 import 'package:webview_flutter/platform_interface.dart';
@@ -73,7 +74,7 @@ class _PrintingWidgetState extends State<PrintingWidget> {
   }
 
   void findDevices() async {
-    flutterBlue.startScan(timeout: const Duration(seconds: 4));
+    flutterBlue.startScan(timeout: const Duration(seconds: 2));
     flutterBlue.scanResults.listen((results) {
       if (mounted) {
         setState(() {
@@ -113,11 +114,11 @@ class _PrintingWidgetState extends State<PrintingWidget> {
     // printer.add(gen.imageRaster(image));
 
     // Load the image asset
-    final ByteData imageData = await rootBundle.load('asset/Kauvery_Hospital_logo.png');
-    final Uint8List bytes = imageData.buffer.asUint8List();
-
-    // Add image to the printer
-    printer.add(gen.imageRaster(img.decodeImage(bytes)!));
+    // final ByteData imageData = await rootBundle.load('asset/Kauvery_Hospital_logo.png');
+    // final Uint8List bytes = imageData.buffer.asUint8List();
+    //
+    // // Add image to the printer
+    // printer.add(gen.imageRaster(img.decodeImage(bytes)!));
 
     printer.add(gen.text('${widget.currenttoken}',
         styles: PosStyles(
@@ -151,6 +152,8 @@ class _PrintingWidgetState extends State<PrintingWidget> {
     //printer.add(gen.feed(1));
     printer.add(gen.cut());
     print("PPPPPPPPPPPPPPPPPPPPPPP ${printer._data.toString()}");
+    print("Data length: ${printer._data.length}");
+
 
     await printer.printData(device);
 
@@ -393,40 +396,109 @@ class _PrintingWidgetState extends State<PrintingWidget> {
   AutoSelectandprintToken() {
     bool found = false;
     int k = 0;
+    Timer? timer; // Declare a timer variable
+
+    // Function to show alert and pop the screen
+    void showAlertAndPop() {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10.0),
+            ),
+            title: Text(
+              'Printer Not Found/Connected',
+              style: TextStyle(
+                color: Colors.red,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Please cancel the token:',
+                  style: TextStyle(
+                    fontSize: 16.0,
+                  ),
+                ),
+                SizedBox(height: 5),
+                Text(
+                  '${widget.currenttoken}',
+                  style: TextStyle(
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: 10),
+                Text(
+                  'and try again.',
+                  style: TextStyle(
+                    fontSize: 16.0,
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context); // Close the dialog
+                  Navigator.pop(context); // Close the screen
+                },
+                child: Text(
+                  'OK',
+                  style: TextStyle(
+                    fontSize: 18.0,
+                    color: Colors.blue,
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+      );
+    }
+
+
     found
         ? null
-        : Timer.periodic(Duration(seconds: 2), (timer) async{
-            if (scanResult == null) {
-              print("NOPPPPEE");
-            } else {
-              for (int i = 0; i < (scanResult!.length); i++) {
-                print(
-                    "SSSSSSSSSSSSSSSSSSSSSSSSS${scanResult![i].device.id.id.toString()}");
-                //Kavery alwarpet
-                //final ip= '03:12:44:DA:57:3C';
-                //Kavery trichy
-                //final ip='DC:0D:30:01:B1:AA';
-                final ip=Const.printerIp;
-                if ('${scanResult![i].device.id.id}' == ip) {
-                  found = true;
-                  scanResult![i].device.disconnect();
-                  timer.cancel();
-                  await printWithDevice(scanResult![i].device);
-                  Navigator.pop(context);
-                  break;
-                }
-              }
-              k++;
+        : timer = Timer.periodic(Duration(seconds: 2), (timer) async {
+      if (scanResult == null) {
+        print("NOPPPPEE");
+      } else {
+        for (int i = 0; i < scanResult!.length; i++) {
+          print(
+              "SSSSSSSSSSSSSSSSSSSSSSSSS${scanResult![i].device.id.id.toString()}");
 
-              found
-                  ? {
-                      ScaffoldMessenger.of(context)
-                          .showSnackBar(SnackBar(content: Text('Printing')))
-                    }
-                  : null;
+          final ip = Const.printerIp;
+
+          if ('${scanResult![i].device.id.id}' == ip) {
+            found = true;
+            scanResult![i].device.disconnect();
+            timer.cancel();
+            await printWithDevice(scanResult![i].device);
+            Navigator.pop(context);
+            if (widget.currenttoken % 50 == 0) {
+              Restart.restartApp();
             }
-          });
+            break;
+          }
+        }
+        k++;
+
+        if (!found && k >= 10) {
+          timer.cancel(); // Stop the timer if printer is not found after 20 seconds
+          showAlertAndPop(); // Show alert and pop the screen
+          if (widget.currenttoken % 50 == 0) {
+            Restart.restartApp();
+          }
+        }
+      }
+    });
   }
+
 
   _launchURL(BuildContext context) async {
     try {

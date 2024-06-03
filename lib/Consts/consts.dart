@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 class Const{
-  static final String webViewURL='http://signalr.timesmed.com/Login/KaveriLogin?user=dashboarduser-tr';
-  static final String tokenURL='http://signalr.timesmed.com/token/generatetoken?deptId=2';
-  static final String printerIp='DC:0D:30:01:B1:AA';
+  static final String webViewURL='http://signalr.timesmed.com/Login/KaveriLogin';
+  static final String tokenURL='http://signalr.timesmed.com//token/generatetoken?deptId=1';
+  static final String printerIp='DC:0D:30:DE:28:29';
 }
 
 
@@ -27,5 +27,7 @@ String toekngeturl='http://signalr.timesmed.com/token/generatetoken?deptId=2';
 
 //Kavery alwarpet
 //final ip= '03:12:44:DA:57:3C';
+//Kavery alwarpet new printer
+//final ip: 'DC:0D:30:DE:28:29';
 //Kavery trichy
 final ip='DC:0D:30:01:B1:AA';
